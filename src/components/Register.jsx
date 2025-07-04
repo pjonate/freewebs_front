@@ -2,12 +2,17 @@ import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import "../styles/Register.css"
 import axios from 'axios';
+import { useNavigate } from "react-router-dom";
 
 const Register = () => {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [errors, setErrors] = useState({});
+  const [showWelcome, setShowWelcome] = useState(false);
+  const [fadeOutWelcome, setFadeOutWelcome] = useState(false);
+
+  const navigate = useNavigate();
 
   const validate = () => {
     const newErrors = {};
@@ -37,7 +42,7 @@ const Register = () => {
 
     if (Object.keys(formErrors).length === 0) {
       try {
-        const response = await axios.post('http://127.0.0.1:8000/api/register', {
+        const response = await axios.post('/api/register', {
           name,
           email,
           password
@@ -50,6 +55,19 @@ const Register = () => {
       
         alert('✅ Usuario registrado con éxito');
         console.log(response.data);
+        // Si llega aquí, el registro fue exitoso
+
+        setShowWelcome(true);
+
+        setTimeout(() => {
+          setFadeOutWelcome(true);
+        }, 2500);
+
+        setTimeout(() => {
+          setShowWelcome(false);
+          // Redirigir, limpiar formulario, etc.
+          navigate("/");
+        }, 4000);
       } catch(error){
         console.error(error);
         alert('❌ Error al registrar');
@@ -58,74 +76,86 @@ const Register = () => {
   };
 
   return (
-    <div className="container-fluid bg-light vh-100">
-      {/* Flecha hacia atrás */}
-      <Link to="/" className="position-absolute top-0 start-0 m-4 text-white fs-4">
-        <i className="bi bi-arrow-left"></i>
-      </Link>
 
-      <div className="row h-100">
-        {/* Panel izquierdo azul */}
-        <div className="col-2 d-none d-md-block bg-dark-blue h-100 p-0"></div>
-
-        {/* Formulario centrado */}
-        <div className="col-12 col-md-8 d-flex justify-content-center align-items-center">
-          <div className="bg-white p-5 rounded shadow w-100" style={{ maxWidth: '400px' }}>
-            <h2 className="mb-4 text-center text-dark blue">Crear cuenta</h2>
-            <form onSubmit={handleSubmit}>
-              <div className="mb-3">
-                <input 
-                  type="text" 
-                  className="form-control" 
-                  placeholder="Nombre" 
-                  value={name}
-                  onChange={(e) => setName(e.target.value)} 
-                />
-                {errors.name && <div className='text-danger'>{errors.name}</div>}
-              </div>
-
-              <div className='mb-3'>
-                <input
-                  type="email"
-                  className="form-control"
-                  placeholder='Correo electrónico'
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                />
-                {errors.email && <div className='text-danger'>{errors.email}</div>}
-              </div>
-
-              <div className="mb-3">
-                <input 
-                  type="password" 
-                  className="form-control" 
-                  placeholder="Contraseña" 
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                />
-                {errors.password && <div className="text-danger">{errors.password}</div>}
-              </div>
-
-              <button type="submit" className="btn btn-primary w-100">Registrarse</button>
-              <div className="text-center mb-3 text-muted">— o —</div>
-
-              <button type="button" className="btn btn-outline-danger w-100 mb-2">
-                <i className="bi bi-google me-2"></i> Registrarse con Google
-              </button>
-
-              <button type="button" className="btn btn-outline-primary w-100">
-                <i className="bi bi-facebook me-2"></i> Registrarse con Facebook
-              </button>
-            </form>
-          </div>
-        </div>
-
-        {/* Panel derecho azul */}
-        <div className="col-2 d-none d-md-block bg-dark-blue h-100 p-0"></div>
+    <>
+    {/*amimation*/}
+    {showWelcome ? (
+      <div className={`welcome-overlay ${fadeOutWelcome ? "fade-out" : "fade-in"}`}>
+        <h1 className="welcome-text">Bienvenidos</h1>
       </div>
-    </div>
+    ) : (
+      <div className="container-fluid bg-light vh-100">
+        {/* Flecha hacia atrás */}
+        <Link to="/" className="position-absolute top-0 start-0 m-4 text-white fs-4">
+          <i className="bi bi-arrow-left"></i>
+        </Link>
+
+        <div className="row h-100">
+
+          {/* Panel izquierdo azul */}
+          <div className="col-2 d-none d-md-block bg-dark-blue h-100 p-0"></div>
+
+          {/* Formulario centrado */}
+          <div className="col-12 col-md-8 d-flex justify-content-center align-items-center">
+            <div className="bg-white p-5 rounded shadow w-100" style={{ maxWidth: '400px' }}>
+              <h2 className="mb-4 text-center text-dark blue">Crear cuenta</h2>
+              <form onSubmit={handleSubmit}>
+                <div className="mb-3">
+                  <input 
+                    type="text" 
+                    className="form-control" 
+                    placeholder="Nombre" 
+                    value={name}
+                    onChange={(e) => setName(e.target.value)} 
+                  />
+                  {errors.name && <div className='text-danger'>{errors.name}</div>}
+                </div>
+
+                <div className='mb-3'>
+                  <input
+                    type="email"
+                    className="form-control"
+                    placeholder='Correo electrónico'
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                  />
+                  {errors.email && <div className='text-danger'>{errors.email}</div>}
+                </div>
+
+                <div className="mb-3">
+                  <input 
+                    type="password" 
+                    className="form-control" 
+                    placeholder="Contraseña" 
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                  />
+                  {errors.password && <div className="text-danger">{errors.password}</div>}
+                </div>
+
+                <button type="submit" className="btn btn-primary w-100">Registrarse</button>
+                <div className="text-center mb-3 text-muted">— o —</div>
+
+                <button type="button" className="btn btn-outline-danger w-100 mb-2">
+                  <i className="bi bi-google me-2"></i> Registrarse con Google
+                </button>
+
+                <button type="button" className="btn btn-outline-primary w-100">
+                  <i className="bi bi-facebook me-2"></i> Registrarse con Facebook
+                </button>
+              </form>
+            </div>
+          </div>
+
+          {/* Panel derecho azul */}
+          <div className="col-2 d-none d-md-block bg-dark-blue h-100 p-0"></div>
+        </div>
+      </div>
+    )}
+    </>
   );
 };
+
 
 export default Register;
 
